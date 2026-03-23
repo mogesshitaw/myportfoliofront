@@ -42,6 +42,7 @@ import {
   IconCheck,
 } from '@tabler/icons-react'
 import apiClient from '@/lib/api'
+import { CreateProjectButton } from './create-project-button'
 
 interface Project {
   id: string
@@ -197,15 +198,8 @@ export function ProjectsList() {
             Create your first project to get started
           </Text>
           <Group justify="center">
-            <Button
-              component={Link}
-              href="/projects/new"
-              leftSection={<IconPlus size={16} />}
-              variant="gradient"
-              gradient={{ from: 'blue', to: 'violet' }}
-            >
-              Create Project
-            </Button>
+                     <CreateProjectButton />
+           
           </Group>
         </Paper>
       </Container>

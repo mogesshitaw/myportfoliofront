@@ -19,11 +19,22 @@ function UnauthorizedPage() {
   const theme = useMantineTheme()
   const { colorScheme } = useMantineColorScheme()
   const isDark = colorScheme === 'dark'
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Use a static color during SSR to prevent hydration mismatch
+  const backgroundColor = !mounted ? '#f8f9fa' : (isDark ? theme.colors.dark[7] : '#f8f9fa')
+  const paperBg = !mounted ? 'white' : (isDark ? theme.colors.dark[6] : 'white')
+  const borderColor = !mounted ? '#e9ecef' : (isDark ? theme.colors.dark[4] : theme.colors.gray[2])
+  const titleColor = !mounted ? 'dark.9' : (isDark ? 'white' : 'dark.9')
 
   return (
     <Center style={{ 
       minHeight: '100vh',
-      background: isDark ? theme.colors.dark[7] : '#f8f9fa'
+      background: backgroundColor
     }}>
       <Paper
         radius="lg"
@@ -33,8 +44,8 @@ function UnauthorizedPage() {
           maxWidth: 500,
           width: '100%',
           textAlign: 'center',
-          backgroundColor: isDark ? theme.colors.dark[6] : 'white',
-          borderColor: isDark ? theme.colors.dark[4] : theme.colors.gray[2],
+          backgroundColor: paperBg,
+          borderColor: borderColor,
         }}
       >
         <Box
@@ -52,7 +63,7 @@ function UnauthorizedPage() {
           <IconLock size={40} color="white" />
         </Box>
 
-        <Title order={2} size="h2" mb="sm" c={isDark ? 'white' : 'dark.9'}>
+        <Title order={2} size="h2" mb="sm" c={titleColor}>
           Unauthorized Access
         </Title>
         
@@ -79,7 +90,7 @@ function UnauthorizedPage() {
           size="sm"
           mt="md"
           leftSection={<IconArrowLeft size={16} />}
-          color={isDark ? 'gray.4' : 'dark.6'}
+          color={!mounted ? 'dark.6' : (isDark ? 'gray.4' : 'dark.6')}
         >
           Back to Home
         </Button>
@@ -128,14 +139,16 @@ export default function DashboardLayout({
   }, [pathname, isMobile, close, opened])
 
   // Show loading state during SSR or while checking auth
+  // FIXED: Use a static color when not mounted to prevent hydration mismatch
   if (!mounted || isLoading || isCheckingAuth) {
     return (
       <Center style={{ 
         minHeight: '100vh',
-        background: isDark ? theme.colors.dark[7] : '#f8f9fa'
+        background: !mounted ? '#f8f9fa' : (isDark ? theme.colors.dark[7] : '#f8f9fa')
       }}>
         <Stack align="center" gap="md">
-          <Loader size="lg" color={isDark ? 'white' : 'blue'} />
+          {/* FIXED: Use static color during SSR, dynamic after hydration */}
+          <Loader size="lg" color={!mounted ? 'blue' : (isDark ? 'white' : 'blue')} />
           <Text c="dimmed">Loading dashboard...</Text>
         </Stack>
       </Center>

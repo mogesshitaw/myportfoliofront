@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { notifications } from '@mantine/notifications';
 
@@ -22,12 +23,8 @@ interface AuthContextType {
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   getCurrentUser: () => Promise<User | null>;
-  updateUser: (userData: Partial<User>) => void; // Add this
+  updateUser: (userData: Partial<User>) => void;
 }
-
-
-
-
 
 interface RegisterData {
   email: string;
@@ -71,49 +68,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    checkAuth();
+  // FIXED: Use useCallback to prevent infinite loops
+  const clearAuthData = useCallback(() => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    setUser(null);
   }, []);
 
-  const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/auth/me`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-
-      const data: MeResponse = await response.json();
-
-      if (response.ok && data.success) {
-        setUser(data.data.user);
-      } else {
-        // Token might be expired, try to refresh
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          await refreshAccessToken(refreshToken);
-        } else {
-          clearAuthData();
-        }
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      clearAuthData();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const refreshAccessToken = async (refreshToken: string) => {
+  // FIXED: Use useCallback for refreshAccessToken
+  const refreshAccessToken = useCallback(async (refreshToken: string) => {
     try {
       const response = await fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
@@ -139,16 +102,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       clearAuthData();
       return false;
     }
-  };
+  }, [clearAuthData]);
 
-  const clearAuthData = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    setUser(null);
-  };
+  // FIXED: Use useCallback for checkAuth
+  const checkAuth = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      console.log('🔍 Checking auth, token exists:', !!token);
+      
+      if (!token) {
+        console.log('❌ No token found');
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('📡 Fetching user data from /auth/me');
+      const response = await fetch(`${API_URL}/auth/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      const data: MeResponse = await response.json();
+      console.log('📡 Auth response:', { ok: response.ok, success: data.success, hasUser: !!data.data?.user });
+
+      if (response.ok && data.success && data.data?.user) {
+        console.log('✅ User authenticated:', data.data.user.email);
+        setUser(data.data.user);
+      } else {
+        console.log('⚠️ Token invalid, trying to refresh...');
+        // Token might be expired, try to refresh
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (refreshToken) {
+          await refreshAccessToken(refreshToken);
+        } else {
+          console.log('❌ No refresh token, clearing auth');
+          clearAuthData();
+        }
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      clearAuthData();
+    } finally {
+      setIsLoading(false);
+    }
+  }, [refreshAccessToken, clearAuthData]);
+
+  // FIXED: Only run checkAuth once on mount
+  useEffect(() => {
+    checkAuth();
+  }, []); // Empty dependency array - only run once
 
   const login = async (email: string, password: string) => {
     try {
+      console.log('🔐 Attempting login for:', email);
+      
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
@@ -159,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const data: LoginResponse = await response.json();
+      console.log('🔐 Login response:', { ok: response.ok, success: data.success, role: data.data?.user?.role });
 
       if (!response.ok || !data.success) {
         return { 
@@ -179,13 +191,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         message: 'Logged in successfully',
         color: 'green',
       });
-       if(data.data.user.role=="client"){
-       router.push('/');
-       }
-       else{
-        router.push('/dashboard');
-       }
       
+      // FIXED: Check role correctly
+      console.log('🔐 User role:', data.data.user.role);
+      if (data.data.user.role === 'client') {
+        console.log('🔐 Redirecting to home page');
+        router.push('/');
+      } else if (data.data.user.role === 'admin') {
+        console.log('🔐 Redirecting to dashboard');
+        router.push('/dashboard');
+      } else {
+        console.log('🔐 Unknown role, redirecting to home');
+        router.push('/');
+      }
       
       return { success: true };
     } catch (error: any) {
@@ -283,7 +301,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const data: MeResponse = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok && data.success && data.data?.user) {
         return data.data.user;
       }
       return null;
@@ -292,11 +310,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return null;
     }
   };
-  // In the AuthProvider component, add:
-const updateUser = (userData: Partial<User>) => {
-  setUser(prev => prev ? { ...prev, ...userData } : null);
-};
 
+  const updateUser = (userData: Partial<User>) => {
+    setUser(prev => prev ? { ...prev, ...userData } : null);
+  };
 
   return (
     <AuthContext.Provider 
@@ -306,7 +323,7 @@ const updateUser = (userData: Partial<User>) => {
         login, 
         register, 
         logout, 
-        getCurrentUser ,
+        getCurrentUser,
         updateUser
       }}
     >

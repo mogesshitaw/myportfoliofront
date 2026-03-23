@@ -1,7 +1,7 @@
 ﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import {
   Container,
@@ -79,12 +79,7 @@ export default function DashboardPage() {
   const theme = useMantineTheme()
   const { colorScheme } = useMantineColorScheme()
   const isDark = colorScheme === 'dark'
-
-  useEffect(() => {
-    fetchDashboardData()
-  }, [])
-
-  const fetchDashboardData = async () => {
+ const fetchDashboardData = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
@@ -100,8 +95,13 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
-  }
+  },[]);
 
+  useEffect(() => {
+    fetchDashboardData()
+  }, [fetchDashboardData])
+
+ 
   const getMockData = (): DashboardStats => ({
     users: {
       total: 1250,
