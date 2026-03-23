@@ -302,7 +302,7 @@ if (!mounted || loading) {
     status: project.status === 'completed' ? 'Completed' : 
             project.status === 'in-progress' ? 'In Progress' : 'Active',
     tags: project.technologies?.slice(0, 3) || [],
-    link: `/projects/${project.id}`
+    link: `/myprojects/${project.id}`
   });
 
   if (!mounted || loading) {
