@@ -5,6 +5,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import ChatModal from '@/components/chat/ChatModal';
+ 
+ 
 import { 
   Container, 
   Group, 
@@ -65,7 +68,8 @@ export default function Navbar() {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const theme = useMantineTheme();
   const isDark = colorScheme === 'dark';
-  
+    const [chatModalOpened, setChatModalOpened] = useState(false);
+
   const isClient = user?.role === 'client';
   const isAdmin = user?.role === 'admin';
   const router = useRouter();
@@ -373,13 +377,12 @@ export default function Navbar() {
                     <Menu.Divider />
                     
                     {isClient && (
-                      <Menu.Item 
-                        component={Link} 
-                        href="/chat" 
-                        leftSection={<IconMessage size={16} />}
-                      >
-                        Direct chat with me
-                      </Menu.Item>
+                       <Menu.Item
+                                leftSection={<IconMessage size={16} />}
+                                onClick={() => setChatModalOpened(true)}
+                            >
+                                Chat with Agent
+                            </Menu.Item>
                     )}
                     
                     {isAdmin && (
@@ -537,6 +540,10 @@ export default function Navbar() {
           )}
         </Stack>
       </Drawer>
+       <ChatModal 
+                opened={chatModalOpened} 
+                onClose={() => setChatModalOpened(false)} 
+            />
     </>
   );
 }
