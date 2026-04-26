@@ -1,12 +1,14 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 'use client'
 
-import { Container, Title, Text, SimpleGrid, Card, Avatar, Group, Badge, Divider, ThemeIcon, Button, Stack, Box, useMantineTheme, useMantineColorScheme, ActionIcon } from '@mantine/core'
-import { IconBriefcase, IconSchool, IconMapPin, IconMail, IconPhone, IconCode, IconStar, IconBrandGithub, IconBrandLinkedin, IconBrandTelegram, IconSend } from '@tabler/icons-react'
+import { Container, Progress,Title, Paper,Text,SimpleGrid, Card, Avatar, Group, Badge, Divider, ThemeIcon, Button, Stack, Box, useMantineTheme, useMantineColorScheme, ActionIcon } from '@mantine/core'
+import { IconBriefcase, IconSchool, IconMapPin, IconMail, IconPhone,IconBrandReact,IconBrandNodejs, IconDatabase,IconCode, IconStar, IconBrandGithub, IconBrandLinkedin, IconBrandTelegram, IconSend } from '@tabler/icons-react'
 import Link from 'next/link'
 import Navbar from '@/app/components/Navbar'
 import { useState, useEffect } from 'react'
 import Footer from '../components/Footer'
+import { motion } from 'framer-motion';
+
 
 export default function AboutPage() {
  const [mounted, setMounted] = useState(false)
@@ -35,16 +37,19 @@ export default function AboutPage() {
   }
 
     const skills = [
-    { name: 'React', level: '90%', color: '#61dafb' },
-    { name: 'Next.js', level: '85%', color: '#000000' },
-    { name: 'Node.js', level: '80%', color: '#68a063' },
-    { name: 'TypeScript', level: '85%', color: '#3178c6' },
-    { name: 'PHP', level: '88%', color: '#777bb4' },
-    { name: 'MySQL', level: '85%', color: '#4479a1' },
-    { name: 'JavaScript', level: '95%', color: '#f7df1e' },
-    { name: 'HTML/CSS', level: '95%', color: '#e34c26' },
-    { name: 'Git/GitHub', level: '90%', color: '#f1502f' },
-    { name: 'MongoDB', level: '75%', color: '#47a248' },
+     { name: 'React', level: 75, icon: IconBrandReact, color: '#61dafb' },
+    { name: 'Next.js', level:70, icon: IconCode, color: '#000000' },
+    { name: 'Node.js', level: 80, icon: IconBrandNodejs, color: '#68a063' },
+    { name: 'TypeScript/Javascript', level: 75, icon: IconCode, color: '#3178c6' },
+    { name: 'MySQL', level: 75, icon: IconDatabase, color: '#47a248' },
+    { name: 'PostgreSQL', level: 80, icon: IconDatabase, color: '#336791' },
+    { name: 'Tailwind CSS', level: 80, icon: IconCode, color: '#06b6d4' },
+    { name: 'Bootstrap/HTML/CSS', level: 90, icon: IconCode, color: '#06b6d4' },
+    { name: 'Prisma', level: 75, icon: IconDatabase, color: '#2d3748' },
+    { name: 'C++', level: 75, icon: IconCode, color: '#00599C' },
+    { name: 'Java', level: 70, icon: IconCode, color: '#007396' },  
+    { name: 'PHP', level: 65, icon: IconCode, color: '#777BB4' },
+    { name: 'Git/GitHub', level: 80, icon: IconBrandGithub, color: '#f34f29' },
   ]
 
   const experiences = [
@@ -140,8 +145,9 @@ export default function AboutPage() {
               backgroundColor: isDark ? theme.colors.dark[6] : 'white',
               borderColor: isDark ? theme.colors.dark[4] : theme.colors.gray[2],
             }}
-          >
+          >l
             <Stack align="center" gap="md">
+              
               <Avatar
                 src="/images/about.jpg"
                 size={150}
@@ -161,9 +167,9 @@ export default function AboutPage() {
               <Text c="blue.6" fw={500}>
                 Full Stack Developer
               </Text>
-              <Badge color="blue" variant="light" size="lg">
+              {/* <Badge color="blue" variant="light" size="lg">
                 🚀 3+ Years Experience
-              </Badge>
+              </Badge> */}
               
               <Divider 
                 style={{ 
@@ -178,6 +184,7 @@ export default function AboutPage() {
                     <IconMail size={18} color={isDark ? theme.colors.blue[5] : '#667eea'} />
                     <Text size="sm">mogesshitaw318@gmail.com</Text>
                   </Group>
+                
                   <Group gap="sm" c={isDark ? 'gray.3' : 'dark.6'}>
                     <IconPhone size={18} color={isDark ? theme.colors.blue[5] : '#667eea'} />
                     <Text size="sm">+251 935 945 658</Text>
@@ -391,31 +398,40 @@ export default function AboutPage() {
               </Title>
             </Group>
 
-            <SimpleGrid cols={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing="md">
-              {skills.map((skill) => (
-                <Card
+              <SimpleGrid cols={{ base: 2, sm: 3, md: 5 }} spacing="md">
+            {skills.map((skill, index) => {
+              const Icon = skill.icon;
+              return (
+                <motion.div
                   key={skill.name}
-                  padding="md"
-                  radius="md"
-                  withBorder
-                  style={{
-                    backgroundColor: isDark ? theme.colors.dark[5] : '#f9fafb',
-                    borderColor: isDark ? theme.colors.dark[3] : '#e5e7eb',
-                    textAlign: 'center',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                    cursor: 'default',
-                  }}
-                  className="hover:transform hover:-translate-y-1 hover:shadow-md"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05, duration: 0.3 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -5 }}
                 >
-                  <Text size="lg" fw={600} c={isDark ? 'white' : 'dark.9'} mb={4}>
-                    {skill.name}
-                  </Text>
-                  <Text size="sm" c="blue.6" fw={500}>
-                    {skill.level}
-                  </Text>
-                </Card>
-              ))}
-            </SimpleGrid>
+                  <Paper
+                    p="md"
+                    radius="md"
+                    withBorder
+                    style={{
+                      backgroundColor: isDark ? theme.colors.dark[6] : 'white',
+                      textAlign: 'center',
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    <ThemeIcon size={50} radius="md" variant="light" color="blue" mb="sm">
+                      <Icon size={28} />
+                    </ThemeIcon>
+                    <Text fw={600} size="sm" c={isDark ? 'white' : 'dark.9'}>{skill.name}</Text>
+                    {/* <Progress value={skill.level} size="sm" mt={8} />
+                    <Text size="xs" c="dimmed" mt={4}>{skill.level}%</Text> */}
+                  </Paper>
+                </motion.div>
+              );
+            })}
+          </SimpleGrid>
+
           </Card>
 
           {/* Call to Action */}

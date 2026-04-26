@@ -169,17 +169,13 @@ export default function HomePage() {
   };
 
 
-  useEffect(() => {
+useEffect(() => {
     if (isAutoPlaying && testimonials.length > 1) {
       autoPlayRef.current = setInterval(() => {
         setCurrentTestimonialIndex((prev) => (prev + 1) % testimonials.length);
       }, 5000);
     }
-    return () => {
-      if (autoPlayRef.current) {
-        clearInterval(autoPlayRef.current);
-      }
-    };
+    return () => { if (autoPlayRef.current) clearInterval(autoPlayRef.current); };
   }, [isAutoPlaying, testimonials.length]);
 
     const handleTestimonialChange = (index: number) => {
@@ -201,12 +197,14 @@ useEffect(() => {
   setMounted(true);
 }, []);
 
+// Prevent Hydration mismatch
+  if (!mounted) return null;
 // Then update your loading section
-if (!mounted || loading) {
+if (loading) {
   return (
     <>
       <Navbar />
-      <Box style={{ 
+       <Box style={{ 
         minHeight: 'calc(100vh - 70px)', 
         backgroundColor: '#f8f9fa'  // Fixed color for SSR
       }}>
@@ -224,29 +222,34 @@ if (!mounted || loading) {
   const personalInfo = {
     name: 'Moges Shitaw',
     title: 'Full Stack Developer',
-    bio: 'I craft beautiful, responsive, and high-performance web applications. With 3+ years of experience, I turn ideas into reality with clean code and modern design.',
+    bio: 'I craft beautiful, responsive, and high-performance web applications.  I turn ideas into reality with clean code and modern design.',
     location: 'Addis Ababa, Ethiopia',
     email: 'mogesshitaw318@gmail.com',
     github: 'https://github.com/mogesshitaw',
     linkedin: 'https://linkedin.com/in/moges-shitaw',
     twitter: 'https://twitter.com/mogesshitaw',
-    experience: '3+',
+    // experience: ' junior developer',
     projects: 0,
     technologies: '15+',
     happyClients: 0
   };
 
   const skills = [
-    { name: 'React', level: 90, icon: IconBrandReact, color: '#61dafb' },
-    { name: 'Next.js', level: 85, icon: IconCode, color: '#000000' },
+     
+    { name: 'React', level: 75, icon: IconBrandReact, color: '#61dafb' },
+    { name: 'Next.js', level:70, icon: IconCode, color: '#000000' },
     { name: 'Node.js', level: 80, icon: IconBrandNodejs, color: '#68a063' },
-    { name: 'TypeScript', level: 85, icon: IconCode, color: '#3178c6' },
-    { name: 'MongoDB', level: 75, icon: IconDatabase, color: '#47a248' },
+    { name: 'TypeScript/Javascript', level: 75, icon: IconCode, color: '#3178c6' },
+    { name: 'MySQL', level: 75, icon: IconDatabase, color: '#47a248' },
     { name: 'PostgreSQL', level: 80, icon: IconDatabase, color: '#336791' },
-    { name: 'Tailwind CSS', level: 90, icon: IconCode, color: '#06b6d4' },
-    { name: 'Prisma', level: 85, icon: IconDatabase, color: '#2d3748' },
-    { name: 'Figma', level: 70, icon: IconBrandFigma, color: '#f24e1e' },
-    { name: 'AWS', level: 65, icon: IconCloud, color: '#ff9900' }
+    { name: 'Tailwind CSS', level: 80, icon: IconCode, color: '#06b6d4' },
+    { name: 'Bootstrap/HTML/CSS', level: 90, icon: IconCode, color: '#06b6d4' },
+    { name: 'Prisma', level: 75, icon: IconDatabase, color: '#2d3748' },
+    { name: 'C++', level: 75, icon: IconCode, color: '#00599C' },
+    { name: 'Java', level: 70, icon: IconCode, color: '#007396' },  
+    { name: 'PHP', level: 65, icon: IconCode, color: '#777BB4' },
+    { name: 'Git/GitHub', level: 80, icon: IconBrandGithub, color: '#f34f29' },
+   
   ];
 
   const services = [
@@ -289,7 +292,7 @@ if (!mounted || loading) {
   ];
 
   const stats = [
-    { value: personalInfo.experience, label: 'Years Experience', suffix: '+' },
+    // { value: personalInfo.experience, label: 'Years Experience', suffix: '+' },
     { value: featuredProjects.length, label: 'Projects Completed', suffix: '+' },
     { value: personalInfo.technologies, label: 'Technologies', suffix: '+' },
     { value: testimonials.length, label: 'Happy Clients', suffix: '+' }
@@ -352,7 +355,7 @@ if (!mounted || loading) {
           display: 'flex',
           alignItems: 'center',
           overflow: 'hidden',
-          backgroundImage: 'url(/images/hero2.png)',
+          backgroundImage: 'url(/images/herro.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed',
@@ -428,7 +431,7 @@ if (!mounted || loading) {
                   radius="xl"
                   style={{ padding: '12px 24px', fontSize: '1rem' }}
                 >
-                  🚀 Available for freelance work
+                   Available for freelance work
                 </Badge>
               </motion.div>
 
@@ -489,10 +492,10 @@ if (!mounted || loading) {
                     <IconMail size={18} style={{ color: 'rgba(255,255,255,0.7)' }} />
                     <Text style={{ color: 'rgba(255,255,255,0.7)' }}>{personalInfo.email}</Text>
                   </Group>
-                  <Group gap="xs">
+                  {/* <Group gap="xs">
                     <IconCalendar size={18} style={{ color: 'rgba(255,255,255,0.7)' }} />
                     <Text style={{ color: 'rgba(255,255,255,0.7)' }}>{personalInfo.experience}+ years experience</Text>
-                  </Group>
+                  </Group> */}
                 </Group>
               </motion.div>
 
@@ -772,8 +775,8 @@ if (!mounted || loading) {
                       <Icon size={28} />
                     </ThemeIcon>
                     <Text fw={600} size="sm" c={isDark ? 'white' : 'dark.9'}>{skill.name}</Text>
-                    <Progress value={skill.level} size="sm" mt={8} />
-                    <Text size="xs" c="dimmed" mt={4}>{skill.level}%</Text>
+                    {/* <Progress value={skill.level} size="sm" mt={8} />
+                    <Text size="xs" c="dimmed" mt={4}>{skill.level}%</Text> */}
                   </Paper>
                 </motion.div>
               );
@@ -1097,7 +1100,18 @@ if (!mounted || loading) {
               </Group>
             </Box>
           )}
-
+         {testimonials.length === 0 ? (
+          <Group justify="center" mt="xl">
+            <Button
+              component={Link}
+              href="/testimonials"
+              variant="light"
+              rightSection={<IconArrowRight size={16} />}
+            >
+              Share your Exprience
+            </Button>
+          </Group>
+         ):(
           <Group justify="center" mt="xl">
             <Button
               component={Link}
@@ -1108,6 +1122,7 @@ if (!mounted || loading) {
               Read All Testimonials
             </Button>
           </Group>
+         )}
         </Container>
       </Box>
 

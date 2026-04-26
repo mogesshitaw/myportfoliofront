@@ -52,15 +52,15 @@ const contactInfo = [
   {
     icon: IconMail,
     title: 'Email',
-    value: 'moges.shitaw@example.com',
-    link: 'mailto:moges.shitaw@example.com',
+    value: 'mogesshitaw318@gmail.com',
+    link: 'mailto:mogesshitaw318@gmail.com',
     color: 'blue',
   },
   {
     icon: IconPhone,
     title: 'Phone',
-    value: '+251 912 345 678',
-    link: 'tel:+251912345678',
+    value: '+251 935 945 658',
+    link: 'tel:+251935945658',
     color: 'green',
   },
   {
@@ -83,7 +83,7 @@ const socialLinks = [
   { icon: IconBrandLinkedin, href: 'https://www.linkedin.com/in/moges-shitaw/', label: 'LinkedIn', color: '#0077b5' },
   { icon: IconBrandTelegram, href: 'https://t.me/moges_shitaw', label: 'Telegram', color: '#0088cc' },
   { icon: IconBrandTwitter, href: 'https://twitter.com/mogesshitaw', label: 'Twitter', color: '#1DA1F2' },
-  { icon: IconBrandWhatsapp, href: 'https://wa.me/251912345678', label: 'WhatsApp', color: '#25D366' },
+  { icon: IconBrandWhatsapp, href: 'https://wa.me/251935945658', label: 'WhatsApp', color: '#25D366' },
 ]
 
 const faqs = [
@@ -312,7 +312,7 @@ export default function ContactPage() {
                   <Grid.Col span={{ base: 12, sm: 6 }}>
                     <TextInput
                       label="Your Name"
-                      placeholder="John Doe"
+                      placeholder="moges shitaw"
                       leftSection={<IconUser size={16} />}
                       {...form.getInputProps('name')}
                       size={isMobile ? 'sm' : 'md'}
@@ -331,7 +331,7 @@ export default function ContactPage() {
                   <Grid.Col span={{ base: 12, sm: 6 }}>
                     <TextInput
                       label="Email Address"
-                      placeholder="john@example.com"
+                      placeholder="moges@example.com"
                       leftSection={<IconMail size={16} />}
                       {...form.getInputProps('email')}
                       size={isMobile ? 'sm' : 'md'}

@@ -67,7 +67,7 @@ const faqCategories = [
       },
       {
         q: "How can I contact you?",
-        a: "You can contact me through the contact form on this website, or directly via email at mogesshitaw318@gmail.com. I typically respond within 24 hours."
+        a: "You can contact me through the contact form on this website, or directly via email at mogesshitaw318@gmail.com/ mogesshitaw7702@gmail.com. I typically respond within 24 hours."
       },
       {
         q: "Where are you located?",
@@ -83,7 +83,7 @@ const faqCategories = [
     questions: [
       {
         q: "What technologies do you specialize in?",
-        a: "I specialize in modern web technologies including React, Next.js, Node.js, TypeScript, Python, PHP, MySQL, PostgreSQL, MongoDB, and various cloud services like AWS and Vercel. I also have experience with Tailwind CSS, Mantine, and other modern frameworks."
+        a: "I specialize in modern web technologies including React, Next.js, Node.js, TypeScript, PHP, MySQL, PostgreSQL, and various cloud services like Vercel. I also have experience with Tailwind CSS, Mantine, and other modern frameworks."
       },
       {
         q: "How do you price your services?",
@@ -110,8 +110,8 @@ const faqCategories = [
         a: "I follow an agile methodology with regular updates and clear milestones. The process includes: 1) Discovery & Planning, 2) Design & Prototyping, 3) Development, 4) Testing & QA, 5) Deployment, and 6) Ongoing Support."
       },
       {
-        q: "How do you communicate with clients during the project?",
-        a: "I use various communication channels including email, video calls, and project management tools. I provide regular progress updates and am available for meetings to discuss project requirements and feedback."
+        q: "How do you communicate with clients during the project?", //video calls,
+        a: "I use various communication channels including email,  and project management tools. I provide regular progress updates and am available for meetings to discuss project requirements and feedback."
       },
       {
         q: "Do you provide design services as well?",
@@ -131,12 +131,12 @@ const faqCategories = [
     questions: [
       {
         q: "What frameworks and libraries do you use?",
-        a: "I primarily work with React and Next.js for frontend development, and Node.js with Express for backend. I also have experience with PHP/Laravel, Python/Django, and other frameworks. For styling, I use Mantine, Tailwind CSS, and CSS modules."
+        a: "I primarily work with React and Next.js for frontend development, and Node.js with Express for backend. I also have experience with PHP/Laravel and other frameworks. For styling, I use Mantine, Tailwind CSS, and CSS modules."
       },
-      {
-        q: "Do you build mobile apps?",
-        a: "Yes, I can build mobile applications using React Native, which allows me to create cross-platform apps for both iOS and Android using JavaScript/TypeScript."
-      },
+      // {
+      //   q: "Do you build mobile apps?",
+      //   a: "Yes, I can build mobile applications using React Native, which allows me to create cross-platform apps for both iOS and Android using JavaScript/TypeScript."
+      // },
       {
         q: "How do you ensure code quality?",
         a: "I follow best practices including code reviews, automated testing, and continuous integration. I write clean, maintainable, and well-documented code following industry standards like ESLint and Prettier."
@@ -154,8 +154,8 @@ const faqCategories = [
     color: 'red',
     questions: [
       {
-        q: "What payment methods do you accept?",
-        a: "I accept payments via bank transfer, PayPal, and other international payment platforms. Payment terms are discussed and agreed upon before starting any project."
+        q: "What payment methods do you accept?", //PayPal
+        a: "I accept payments via bank transfer, and other international payment platforms. Payment terms are discussed and agreed upon before starting any project."
       },
       {
         q: "Do you require a deposit?",

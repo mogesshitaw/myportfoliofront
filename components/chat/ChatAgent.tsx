@@ -200,7 +200,7 @@ const ChatAgent: React.FC = () => {
                                                     : theme.colors.gray[1],
                                             color:
                                                 message.type === 'user'
-                                                    ? 'white'
+                                                    ? 'green'
                                                     : isDark
                                                     ? theme.colors.dark[0]
                                                     : theme.colors.gray[8],
