@@ -40,6 +40,8 @@ import {
   IconBrandLinkedin,
   IconDeviceLaptop,
   IconMail,
+  IconPlayerPlay,
+  IconPlayerPause ,
   IconMapPin,
   IconCalendar,
   IconBrandTwitter,
@@ -111,7 +113,7 @@ export default function HomePage() {
     const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
-  
+  const [isAnimating, setIsAnimating] = useState(true);
   const heroRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
   const skillsRef = useRef<HTMLDivElement>(null);
@@ -915,192 +917,217 @@ if (loading) {
       </Box>
 
       {/* Testimonials Section with Carousel */}
-      <Box
-        ref={testimonialsRef}
-        py={80}
-        style={{ backgroundColor: isDark ? theme.colors.dark[9] : theme.colors.gray[0], overflow: 'hidden' }}
-      >
-        <Container size="lg">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            <Stack align="center" gap="xl" mb={50}>
-              <Badge size="lg" variant="gradient" gradient={{ from: '#667eea', to: '#764ba2', deg: 135 }} radius="xl" style={{ padding: '8px 20px' }}>
-                Testimonials
-              </Badge>
-              <Title order={2} size="2.5rem" ta="center" c={isDark ? 'white' : 'dark.9'}>
-                What Clients Say
-              </Title>
-              <Text size="lg" c="dimmed" ta="center" maw={600}>
-                Feedback from people I&apos;ve worked with
-              </Text>
-            </Stack>
-          </motion.div>
+     <Box
+  ref={testimonialsRef}
+  py={80}
+  style={{ backgroundColor: isDark ? theme.colors.dark[9] : theme.colors.gray[0], overflow: 'hidden' }}
+>
+  <Container size="lg">
+    {/* ርዕስ ክፍል */}
+    <motion.div
+      initial={{ opacity: 0, y: 50 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      viewport={{ once: true }}
+    >
+      <Stack align="center" gap="xl" mb={50}>
+        <Badge size="lg" variant="gradient" gradient={{ from: '#667eea', to: '#764ba2', deg: 135 }} radius="xl" style={{ padding: '8px 20px' }}>
+          Testimonials
+        </Badge>
+        <Title order={2} size="2.5rem" ta="center" c={isDark ? 'white' : 'dark.9'}>
+          What Clients Say
+        </Title>
+        <Text size="lg" c="dimmed" ta="center" maw={600}>
+          Feedback from people I've worked with
+        </Text>
+      </Stack>
+    </motion.div>
 
-          {testimonials.length === 0 ? (
-            <Center py={40}>
-              <Stack align="center" gap="sm">
-                <IconStar size={48} color={isDark ? theme.colors.gray[6] : theme.colors.gray[5]} />
-                <Text c="dimmed">No testimonials yet</Text>
-              </Stack>
-            </Center>
-          ) : (
-            <Box pos="relative">
-              {/* Marquee Container with Gradient Fade */}
-              <Box
-                style={{
-                  position: 'relative',
-                  overflow: 'hidden',
-                  padding: '20px 0',
+    {testimonials.length === 0 ? (
+      <Center py={40}>
+        <Stack align="center" gap="sm">
+          <IconStar size={48} color={isDark ? theme.colors.gray[6] : theme.colors.gray[5]} />
+          <Text c="dimmed">No testimonials yet</Text>
+        </Stack>
+      </Center>
+    ) : (
+      <Box pos="relative">
+        <Box
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            padding: '20px 0',
+          }}
+        >
+          {/* Gradient Overlays */}
+          <Box
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 100,
+              background: `linear-gradient(to right, ${isDark ? theme.colors.dark[9] : theme.colors.gray[0]}, transparent)`,
+              zIndex: 2,
+              pointerEvents: 'none',
+            }}
+          />
+          <Box
+            style={{
+              position: 'absolute',
+              right: 0,
+              top: 0,
+              bottom: 0,
+              width: 100,
+              background: `linear-gradient(to left, ${isDark ? theme.colors.dark[9] : theme.colors.gray[0]}, transparent)`,
+              zIndex: 2,
+              pointerEvents: 'none',
+            }}
+          />
+
+          {/* Animated Marquee - Now with Pause/Play support */}
+          <motion.div
+            animate={isAnimating ? {
+              x: [0, - (testimonials.length * 380)],
+            } : {
+              x: 0
+            }}
+            transition={{
+              duration: testimonials.length * 4,
+              repeat: isAnimating ? Infinity : 0,
+              ease: "linear",
+              repeatType: "loop",
+            }}
+            style={{
+              display: 'flex',
+              gap: '24px',
+              width: 'fit-content',
+            }}
+          >
+            {[...testimonials, ...testimonials, ...testimonials].map((testimonial, idx) => (
+              <motion.div
+                key={`${testimonial.id}-${idx}`}
+                whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
+                style={{ width: 350, flexShrink: 0 }}
+              >
+                <Paper
+                  p="xl"
+                  radius="md"
+                  withBorder
+                  style={{
+                    backgroundColor: isDark ? theme.colors.dark[7] : 'white',
+                    height: '100%',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                  }}
+                  className="hover:shadow-xl"
+                >
+                  <IconQuote
+                    size={32}
+                    style={{
+                      position: 'absolute',
+                      top: 16,
+                      right: 16,
+                      opacity: 0.1,
+                      color: isDark ? 'white' : 'black',
+                    }}
+                  />
+                  <Rating value={testimonial.rating} readOnly mb="md" />
+                  <Text size="sm" c="dimmed" mb="xl" lineClamp={4} style={{ minHeight: 80 }}>
+                    &quot;{testimonial.content.length > 120 ? `${testimonial.content.substring(0, 120)}...` : testimonial.content}&quot;
+                  </Text>
+                  <Group gap="sm">
+                    <Avatar
+                      src={testimonial.avatarUrl}
+                      size="md"
+                      radius="xl"
+                      color="blue"
+                    >
+                      {testimonial.author[0]}
+                    </Avatar>
+                    <Box>
+                      <Text fw={600} size="sm" c={isDark ? 'white' : 'dark.9'}>
+                        {testimonial.author}
+                      </Text>
+                      <Text size="xs" c="dimmed" lineClamp={1}>
+                        {testimonial.position} at {testimonial.company}
+                      </Text>
+                    </Box>
+                  </Group>
+                </Paper>
+              </motion.div>
+            ))}
+          </motion.div>
+        </Box>
+
+        {/* Controls - Updated */}
+        <Group justify="center" mt="xl" gap="md">
+          <Button
+            variant="light"
+            onClick={() => {
+              if (isAnimating) {
+                // Pause
+                setIsAnimating(false);
+                setIsAutoPlaying(false);
+                if (autoPlayRef.current) {
+                  clearInterval(autoPlayRef.current);
+                  autoPlayRef.current = null;
+                }
+              } else {
+                // Play
+                setIsAnimating(true);
+                setIsAutoPlaying(true);
+                autoPlayRef.current = setInterval(() => {
+                  setCurrentTestimonialIndex((prev) => (prev + 1) % testimonials.length);
+                }, 5000);
+              }
+            }}
+            size="sm"
+            leftSection={isAnimating ? <IconPlayerPause size={16} /> : <IconPlayerPlay size={16} />}
+          >
+            {isAnimating ? 'Pause' : 'Play'}
+          </Button>
+          
+          <Group gap="xs">
+            {testimonials.map((_, idx) => (
+              <ActionIcon
+                key={idx}
+                size="sm"
+                variant={currentTestimonialIndex === idx ? 'filled' : 'light'}
+                onClick={() => {
+                  // በእጅ ሲቀየር እንቅስቃሴውን አቁም
+                  if (isAnimating) {
+                    setIsAnimating(false);
+                    setIsAutoPlaying(false);
+                    if (autoPlayRef.current) {
+                      clearInterval(autoPlayRef.current);
+                      autoPlayRef.current = null;
+                    }
+                  }
+                  setCurrentTestimonialIndex(idx);
                 }}
               >
-                {/* Gradient Overlays for smooth fade edges */}
                 <Box
                   style={{
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 100,
-                    background: `linear-gradient(to right, ${isDark ? theme.colors.dark[9] : theme.colors.gray[0]}, transparent)`,
-                    zIndex: 2,
-                    pointerEvents: 'none',
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: currentTestimonialIndex === idx 
+                      ? (isDark ? 'white' : '#667eea')
+                      : (isDark ? theme.colors.dark[4] : theme.colors.gray[4]),
                   }}
                 />
-                <Box
-                  style={{
-                    position: 'absolute',
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    width: 100,
-                    background: `linear-gradient(to left, ${isDark ? theme.colors.dark[9] : theme.colors.gray[0]}, transparent)`,
-                    zIndex: 2,
-                    pointerEvents: 'none',
-                  }}
-                />
-
-                {/* Animated Marquee */}
-                <motion.div
-                  animate={{
-                    x: [0, - (testimonials.length * 320)],
-                  }}
-                  transition={{
-                    duration: testimonials.length * 3,
-                    repeat: Infinity,
-                    ease: "linear",
-                    repeatType: "loop",
-                  }}
-                  style={{
-                    display: 'flex',
-                    gap: '24px',
-                    width: 'fit-content',
-                  }}
-                >
-                  {/* Duplicate testimonials for seamless loop */}
-                  {[...testimonials, ...testimonials, ...testimonials].map((testimonial, idx) => (
-                    <motion.div
-                      key={`${testimonial.id}-${idx}`}
-                      whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-                      style={{ width: 320, flexShrink: 0 }}
-                    >
-                      <Paper
-                        p="xl"
-                        radius="md"
-                        withBorder
-                        style={{
-                          backgroundColor: isDark ? theme.colors.dark[7] : 'white',
-                          height: '100%',
-                          position: 'relative',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s ease',
-                        }}
-                        className="hover:shadow-xl"
-                      >
-                        <IconQuote
-                          size={32}
-                          style={{
-                            position: 'absolute',
-                            top: 16,
-                            right: 16,
-                            opacity: 0.1,
-                            color: isDark ? 'white' : 'black',
-                          }}
-                        />
-                        <Rating value={testimonial.rating} readOnly mb="md" />
-                        <Text size="sm" c="dimmed" mb="xl" lineClamp={4} style={{ minHeight: 80 }}>
-                          &quot;{testimonial.content.length > 120 ? `${testimonial.content.substring(0, 120)}...` : testimonial.content}&quot;
-                        </Text>
-                        <Group gap="sm">
-                          <Avatar
-                            src={testimonial.avatarUrl}
-                            size="md"
-                            radius="xl"
-                            color="blue"
-                          >
-                            {testimonial.author[0]}
-                          </Avatar>
-                          <Box>
-                            <Text fw={600} size="sm" c={isDark ? 'white' : 'dark.9'}>
-                              {testimonial.author}
-                            </Text>
-                            <Text size="xs" c="dimmed" lineClamp={1}>
-                              {testimonial.position} at {testimonial.company}
-                            </Text>
-                          </Box>
-                        </Group>
-                      </Paper>
-                    </motion.div>
-                  ))}
-                </motion.div>
-              </Box>
-
-              {/* Controls and Status */}
-              <Group justify="center" mt="xl" gap="md">
-                <Button
-                  variant="light"
-                  onClick={() => {
-                    if (autoPlayRef.current) clearInterval(autoPlayRef.current);
-                    setIsAutoPlaying(!isAutoPlaying);
-                  }}
-                  size="sm"
-                >
-                  {isAutoPlaying ? '⏸ Pause' : '▶ Play'}
-                </Button>
-                <Group gap="xs">
-                  {testimonials.map((_, idx) => (
-                    <ActionIcon
-                      key={idx}
-                      size="sm"
-                      variant={currentTestimonialIndex === idx ? 'filled' : 'light'}
-                      onClick={() => handleTestimonialChange(idx)}
-                      style={{
-                        transition: 'all 0.3s ease',
-                      }}
-                    >
-                      <Box
-                        style={{
-                          width: 8,
-                          height: 8,
-                          borderRadius: '50%',
-                          backgroundColor: currentTestimonialIndex === idx 
-                            ? (isDark ? 'white' : '#667eea')
-                            : (isDark ? theme.colors.dark[4] : theme.colors.gray[4]),
-                        }}
-                      />
-                    </ActionIcon>
-                  ))}
-                </Group>
-                <Text size="xs" c="dimmed">
-                  {currentTestimonialIndex + 1} / {testimonials.length}
-                </Text>
-              </Group>
-            </Box>
-          )}
-         {testimonials.length === 0 ? (
+              </ActionIcon>
+            ))}
+          </Group>
+          <Text size="xs" c="dimmed">
+            {currentTestimonialIndex + 1} / {testimonials.length}
+          </Text>
+        </Group>
+      </Box>
+    )}
+     {testimonials.length === 0 ? (
           <Group justify="center" mt="xl">
             <Button
               component={Link}
@@ -1123,8 +1150,8 @@ if (loading) {
             </Button>
           </Group>
          )}
-        </Container>
-      </Box>
+  </Container>
+</Box>
 
 
       {/* CTA Section */}
