@@ -21,7 +21,8 @@ import {
   IconFolder,
   IconStar,
   IconEye,
-  IconCheck
+  IconCheck,
+  IconHome
 } from "@tabler/icons-react"
 import { useMantineTheme, useMantineColorScheme } from "@mantine/core"
 import {
@@ -480,7 +481,19 @@ export function DashboardHeader({ onMenuClick, isMobile }: DashboardHeaderProps)
                   borderColor: isDark ? theme.colors.dark[5] : theme.colors.gray[2],
                 }}
               />
-              
+               <Menu.Item
+                component={Link}
+                href="/"
+                leftSection={<IconHome size={16} />}
+                style={{
+                  color: isDark ? theme.colors.gray[3] : theme.colors.dark[6],
+                  '&:hover': {
+                    backgroundColor: isDark ? theme.colors.dark[6] : theme.colors.gray[1],
+                  },
+                }}
+              >
+                Home
+              </Menu.Item>
               <Menu.Item
                 component={Link}
                 href="/profile"

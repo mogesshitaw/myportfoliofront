@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import ChatModal from '@/components/chat/ChatModal';
- 
+ import Image from 'next/image';
  
 import { 
   Container, 
@@ -223,31 +223,69 @@ export default function Navbar() {
         <Container size="lg" h={70}>
           <Flex h="100%" align="center" justify="space-between">
             {/* Logo */}
-            <Box component={Link} href="/" style={{ display: 'flex', alignItems: 'center', gap: rem(8) }}>
-              <Box
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: rem(12),
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 10px rgba(59, 130, 246, 0.3)',
-                }}
-              >
-                <span style={{ color: 'white', fontWeight: 'bold', fontSize: rem(18) }}>MS</span>
-              </Box>
-              <Text
-                component="span"
-                size="lg"
-                fw={700}
-                variant="gradient"
-                gradient={{ from: 'blue', to: 'grape', deg: 135 }}
-              >
-                MS Portfolios
-              </Text>
-            </Box>
+       <Box
+  component={Link}
+  href="/"
+  style={{
+    display: 'flex',
+    alignItems: 'center',
+    gap: rem(10),
+    textDecoration: 'none',
+  }}
+>
+  {/* Logo Container */}
+  <Box
+    style={{
+      width: 44,
+      height: 44,
+      borderRadius: rem(12),
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+
+      // 🔥 Dark glass background (like image)
+      background: isDark
+        ? 'linear-gradient(135deg, rgba(30,30,50,0.8), rgba(20,20,35,0.8))'
+        : 'linear-gradient(135deg, #eef2ff, #f5f3ff)',
+
+      // Glow border
+      border: '1px solid rgba(102,126,234,0.4)',
+
+      // Soft glow shadow
+      boxShadow: '0 4px 15px rgba(102,126,234,0.25)',
+
+      backdropFilter: 'blur(12px)',
+    }}
+  >
+    <Image
+      src="/images/logo.png"
+      alt="logo"
+      width={48}
+      height={48}
+      style={{ objectFit: 'contain' }}
+    />
+  </Box>
+
+  {/* Text */}
+  <Box>
+    <Text
+      fw={800}
+      size="sm"
+      style={{
+        letterSpacing: '1px',
+        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      }}
+    >
+      MOGES SHITAW
+    </Text>
+
+    <Text size="xs" c="dimmed">
+      Full Stack Developer
+    </Text>
+  </Box>
+</Box>
 
             {/* Desktop Navigation */}
             <Group gap="xl" visibleFrom="md">

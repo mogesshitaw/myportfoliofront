@@ -52,8 +52,8 @@ const contactInfo = [
   {
     icon: IconMail,
     title: 'Email',
-    value: 'mogesshitaw318@gmail.com',
-    link: 'mailto:mogesshitaw318@gmail.com',
+    value: 'mogesshitaw7702@gmail.com',
+    link: 'mailto:mogesshitaw7702@gmail.com',
     color: 'blue',
   },
   {
@@ -83,13 +83,13 @@ const socialLinks = [
   { icon: IconBrandLinkedin, href: 'https://www.linkedin.com/in/moges-shitaw/', label: 'LinkedIn', color: '#0077b5' },
   { icon: IconBrandTelegram, href: 'https://t.me/moges_shitaw', label: 'Telegram', color: '#0088cc' },
   { icon: IconBrandTwitter, href: 'https://twitter.com/mogesshitaw', label: 'Twitter', color: '#1DA1F2' },
-  { icon: IconBrandWhatsapp, href: 'https://wa.me/251935945658', label: 'WhatsApp', color: '#25D366' },
+  { icon: IconBrandWhatsapp, href: 'https://wa.me/251 935 945 658', label: 'WhatsApp', color: '#25D366' },
 ]
 
 const faqs = [
   {
-    question: 'What services do you offer?',
-    answer: 'I offer full-stack web development, mobile app development, UI/UX design, and consulting services.',
+    question: 'What services do you offer?',//  mobile app development, 
+    answer: 'I offer full-stack web development,UI/UX design, and consulting services.',
   },
   {
     question: 'How long does a typical project take?',

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/set-state-in-effect */
+ 
 'use client';
 
 import Link from 'next/link';
@@ -25,7 +25,6 @@ import {
   Loader,
   ActionIcon,
   Center,
-  Progress,
   Tooltip
 } from '@mantine/core';
 import { 
@@ -43,13 +42,10 @@ import {
   IconPlayerPlay,
   IconPlayerPause ,
   IconMapPin,
-  IconCalendar,
   IconBrandTwitter,
-  IconBrandFigma,
   IconBrandReact,
   IconBrandNodejs,
   IconDatabase,
-  IconCloud,
   IconChevronRight,
   IconQuote,
   IconRocket,
@@ -149,7 +145,7 @@ export default function HomePage() {
     setError(null);
     
     try {
-      const projectsResponse = await apiClient.get('/projects?featured=true&limit=6');
+      const projectsResponse = await apiClient.get('/projects/featured?limit=6');
       if (projectsResponse.data.success) {
         setFeaturedProjects(projectsResponse.data.data);
       }
@@ -856,6 +852,7 @@ if (loading) {
                     viewport={{ once: true }}
                     whileHover={{ y: -8 }}
                   >
+                    
                     <Card
                       padding="lg"
                       radius="md"
@@ -938,7 +935,7 @@ if (loading) {
           What Clients Say
         </Title>
         <Text size="lg" c="dimmed" ta="center" maw={600}>
-          Feedback from people I've worked with
+          Feedback from people I&apos;ve worked with
         </Text>
       </Stack>
     </motion.div>
@@ -1158,14 +1155,7 @@ if (loading) {
       <Box py={80} style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', position: 'relative', overflow: 'hidden' }}>
         <Container size="lg">
           <Stack align="center" gap="lg">
-            <motion.div
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 20 }}
-              viewport={{ once: true }}
-            >
-              <IconSparkles size={48} color="white" />
-            </motion.div>
+           
             <Title order={2} size="2.5rem" c="white" ta="center">
               Ready to Start Your Project?
             </Title>

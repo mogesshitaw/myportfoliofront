@@ -24,9 +24,9 @@ import {
   IconMapPin,
   IconPhone,
   IconArrowUp,
-  IconCode,
 } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const footerLinks = [
   {
@@ -61,7 +61,7 @@ const footerLinks = [
 ];
 
 const contactInfo = [
-  { icon: IconMail, text: 'mogesshitaw318@gmail.com', href: 'mailto:mogesshitaw318@gmail.com' },
+  { icon: IconMail, text: 'mogesshitaw7702@gmail.com', href: 'mailto:mogesshitaw7702@gmail.com' },
   { icon: IconPhone, text: '+251 935 945 658', href: 'tel:+251935945658' },
   { icon: IconMapPin, text: 'Addis Ababa, Ethiopia', href: 'https://maps.google.com/?q=Addis+Ababa,+Ethiopia' },
 ];
@@ -139,8 +139,15 @@ export default function Footer() {
                   justifyContent: 'center',
                 }}
               >
-                <IconCode size={22} color="white" />
-              </Box>
+              <Image
+                    src="/images/logo.png"
+                    alt="logo"
+                    width={48}
+                    height={48}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </Box>
+              
               <Text
                 size="xl"
                 fw={700}

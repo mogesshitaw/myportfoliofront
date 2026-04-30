@@ -328,15 +328,14 @@ export default function PublicProjectsPage() {
       >
         <Container size="lg">
           <Stack align="center" gap="md">
-            <Badge variant="filled" size="lg" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
-              <Group gap={4}>
-                <IconSparkles size={14} />
-                <span>My Projects</span>
-              </Group>
-            </Badge>
             <Title order={1} size="3rem" c="white" ta="center">
               Explore Projects
             </Title>
+              <Badge variant="filled" size="lg" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}>
+              <Group gap={4}>
+                <span>My Projects</span>
+              </Group>
+            </Badge>
             <Text size="lg" c="white" ta="center" opacity={0.9} maw={600}>
               Discover amazing projects from the community
             </Text>

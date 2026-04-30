@@ -55,7 +55,7 @@ const services = [
     color: '#68a063',
     features: [
       'RESTful API development',
-      'GraphQL APIs',
+      // 'GraphQL APIs',
       'Database design',
       'Authentication systems',
       'Server management',
@@ -68,8 +68,8 @@ const services = [
     color: '#764ba2',
     features: [
       'MERN/MEAN stack',
-      'LAMP stack',
-      'JAMstack architecture',
+      // 'LAMP stack',
+      // 'JAMstack architecture',
       'Serverless applications',
       'Cloud integration',
     ],
@@ -81,7 +81,7 @@ const services = [
     color: '#777bb4',
     features: [
       'Custom PHP applications',
-      'WordPress development',
+      // 'WordPress development',
       'Laravel applications',
       'CMS customization',
       'Legacy system support',
@@ -96,7 +96,7 @@ const services = [
       'CI/CD pipeline setup',
       'Cloud deployment',
       'Domain configuration',
-      'SSL certificates',
+      // 'SSL certificates',
       'Performance monitoring',
     ],
   },
@@ -152,7 +152,6 @@ export  function ServicesContent() {
      setMounted(true)
    }, [])
  
-   // በሰርቨር ላይ እና መጀመሪያ ማውንት ላይ ቀላል ቨርሽን አሳይ
    if (!mounted) {
      return (
        <Box style={{ minHeight: '100vh' }}>
@@ -241,19 +240,6 @@ export  function ServicesContent() {
       >
         <Container size="lg">
           <Box style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-            <Badge
-              size="lg"
-              variant="white"
-              style={{ 
-                marginBottom: '20px', 
-                padding: '8px 20px', 
-                fontSize: '14px',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white',
-              }}
-            >
-              ⚡ My Services
-            </Badge>
             <Title
               order={1}
               style={{
@@ -265,6 +251,19 @@ export  function ServicesContent() {
             >
               What I Offer
             </Title>
+             <Badge
+              size="lg"
+              variant="white"
+              style={{ 
+                marginBottom: '20px', 
+                padding: '8px 20px', 
+                fontSize: '14px',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+              }}
+            >
+                My Services
+            </Badge>
             <Text
               style={{
                 fontSize: '18px',
@@ -290,7 +289,6 @@ export  function ServicesContent() {
           }}
         />
       </Box>
-
       <Container size="lg" style={{ marginTop: '-40px', marginBottom: '60px' }}>
         {/* Services Grid */}
         <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
