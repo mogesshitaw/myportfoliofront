@@ -242,7 +242,6 @@ export default function Navbar() {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-
       // 🔥 Dark glass background (like image)
       background: isDark
         ? 'linear-gradient(135deg, rgba(30,30,50,0.8), rgba(20,20,35,0.8))'
@@ -271,6 +270,7 @@ export default function Navbar() {
     <Text
       fw={800}
       size="sm"
+       visibleFrom="md"
       style={{
         letterSpacing: '1px',
         background: 'linear-gradient(135deg, #667eea, #764ba2)',
@@ -280,8 +280,21 @@ export default function Navbar() {
     >
       MOGES SHITAW
     </Text>
+    <Text
+      fw={800}
+      size="sm"
+        hiddenFrom="md"
+      style={{
+        letterSpacing: '1px',
+        background: 'linear-gradient(135deg, #667eea, #764ba2)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+      }}
+    >
+     Developer 
+    </Text>
 
-    <Text size="xs" c="dimmed">
+    <Text size="xs" c="dimmed"  visibleFrom="md">
       Full Stack Developer
     </Text>
   </Box>
@@ -330,7 +343,7 @@ export default function Navbar() {
             </Group>
 
             {/* Right Section */}
-            <Group gap="xs">
+            <Group gap="xs" style={{ display: 'flex', alignItems: 'center' }}>
               {/* Social Links */}
               <ActionIcon
                 component="a"
@@ -414,14 +427,14 @@ export default function Navbar() {
                     </Menu.Label>
                     <Menu.Divider />
                     
-                    {isClient && (
+                    {/* {isClient && (
                        <Menu.Item
                                 leftSection={<IconMessage size={16} />}
                                 onClick={() => setChatModalOpened(true)}
                             >
                                 Chat with Agent
                             </Menu.Item>
-                    )}
+                    )} */}
                     
                     {isAdmin && (
                       <Menu.Item 
@@ -459,12 +472,13 @@ export default function Navbar() {
 
               {/* Mobile Menu Button */}
               <Burger 
-                opened={opened} 
-                onClick={toggle} 
-                hiddenFrom="md" 
-                size="sm"
-                color={isDark ? 'white' : 'black'}
-              />
+              opened={opened} 
+              onClick={toggle} 
+              hiddenFrom="md" 
+              size="sm"
+              color={isDark ? 'white' : 'black'}
+              style={{ alignSelf: 'center' }} // 👈 ይህንን ጨምርበት
+            />
             </Group>
           </Flex>
         </Container>
