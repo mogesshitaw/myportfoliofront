@@ -34,7 +34,7 @@ export default function RootLayout({
                 <Providers>
                     <ChatProvider>
                         {children}
-                        {/* <ChatWrapper /> */}
+                        <ChatWrapper />
                     </ChatProvider>
                 </Providers>
             </body>

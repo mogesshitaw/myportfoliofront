@@ -237,7 +237,7 @@ export default function LoginPage() {
               </Anchor>
             </Text>
 
-            <Paper
+            {/* <Paper
               p="sm"
               withBorder
               style={{
@@ -256,7 +256,7 @@ export default function LoginPage() {
               <Text size="xs" ta="center">
                 Password: demo123
               </Text>
-            </Paper>
+            </Paper> */}
           </Stack>
         </Paper>
 
@@ -268,7 +268,7 @@ export default function LoginPage() {
             color: 'rgba(255, 255, 255, 0.7)' 
           }}
         >
-          &copy; {new Date().getFullYear()} DevPortfolio. All rights reserved.
+          &copy; {new Date().getFullYear()} MsPortfolio. All rights reserved.
         </Text>
       </Container>
     </Box>

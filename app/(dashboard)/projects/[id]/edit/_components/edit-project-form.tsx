@@ -21,6 +21,7 @@ import {
   Progress,
   Alert,
   NumberInput,
+  Badge,
   useMantineTheme,
   useMantineColorScheme,
   Center,
@@ -39,6 +40,14 @@ import {
   IconAlertCircle,
 } from '@tabler/icons-react'
 import apiClient from '@/lib/api'
+
+// Interface for upload response
+interface UploadResponse {
+  success: boolean;
+  imageUrl: string;
+  provider: 'cloudinary' | 'local';
+  publicId?: string;
+}
 
 interface EditProjectFormProps {
   projectId: string
@@ -96,6 +105,69 @@ export function EditProjectForm({ projectId, onSuccess }: EditProjectFormProps) 
     },
   })
 
+  // Upload Method Indicator Component
+  const UploadMethodIndicator = () => {
+    const [uploadMethod, setUploadMethod] = useState<string>('loading');
+    const [error, setError] = useState<string | null>(null);
+    
+    useEffect(() => {
+      const checkUploadMethod = async () => {
+        try {
+          const response = await apiClient.get('/upload/config');
+          if (response.data.success) {
+            setUploadMethod(response.data.config.provider);
+            setError(null);
+          } else {
+            setUploadMethod('local');
+          }
+        } catch (error: any) {
+          console.log('Upload config endpoint not available, using local storage');
+          setUploadMethod('local');
+          setError(null);
+        }
+      };
+      
+      checkUploadMethod();
+    }, []);
+    
+    if (uploadMethod === 'loading') {
+      return (
+        <Group gap="xs" mb="md">
+          <Text size="sm" c="dimmed">Upload Method:</Text>
+          <Badge color="gray" variant="light">
+            <Group gap={4}>
+              <div className="w-3 h-3 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+              <span>Checking...</span>
+            </Group>
+          </Badge>
+        </Group>
+      );
+    }
+    
+    return (
+      <Group gap="xs" mb="md">
+        <Text size="sm" c="dimmed">Upload Method:</Text>
+        <Badge 
+          color={uploadMethod === 'cloudinary' ? 'grape' : 'blue'}
+          variant="light"
+          size="md"
+        >
+          {uploadMethod === 'cloudinary' ? '☁️ Cloudinary CDN' : '💾 Local Storage'}
+        </Badge>
+        {uploadMethod === 'cloudinary' && (
+          <Text size="xs" c="dimmed">
+            (Automatic optimization & CDN delivery)
+          </Text>
+        )}
+        {uploadMethod === 'local' && (
+          <Text size="xs" c="dimmed">
+            (Images saved on server)
+          </Text>
+        )}
+      </Group>
+    );
+  };
+
   // Fetch project data
   useEffect(() => {
     fetchProjectData()
@@ -137,31 +209,89 @@ export function EditProjectForm({ projectId, onSuccess }: EditProjectFormProps) 
   }
 
   const handleImageUpload = async (file: File): Promise<string | null> => {
-    const formData = new FormData()
-    formData.append("image", file)
+    // Validate file
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      setUploadError('Only JPEG, PNG, and WEBP images are allowed');
+      notifications.show({
+        title: 'Invalid File',
+        message: 'Only JPEG, PNG, and WEBP images are allowed',
+        color: 'red',
+        icon: <IconAlertCircle size={16} />,
+      });
+      return null;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Image size must be less than 5MB');
+      notifications.show({
+        title: 'File Too Large',
+        message: 'Image size must be less than 5MB',
+        color: 'red',
+        icon: <IconAlertCircle size={16} />,
+      });
+      return null;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
 
     try {
-      const response = await apiClient.post("/upload/project-image", formData, {
+      setUploadProgress(0);
+      
+      const response = await apiClient.post<UploadResponse>("/upload/project-image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 100))
-          setUploadProgress(percentCompleted)
+          if (progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percent);
+          }
         },
-      })
+      });
 
-      setUploadProgress(100)
-      setTimeout(() => setUploadProgress(0), 1000)
+      if (response.data.success) {
+        setUploadProgress(100);
+        setTimeout(() => setUploadProgress(0), 1000);
+        
+        // Show which provider was used
+        const providerMessage = response.data.provider === 'cloudinary' 
+          ? 'Uploaded to Cloudinary CDN' 
+          : 'Saved locally';
+        
+        notifications.show({
+          title: 'Success',
+          message: `Image uploaded successfully! ${providerMessage}`,
+          color: 'green',
+          icon: <IconCheck size={16} />,
+        });
+        
+        // Store provider info if needed for deletion
+        if (response.data.provider === 'cloudinary' && response.data.publicId) {
+          localStorage.setItem(`img_${response.data.publicId}`, response.data.publicId);
+        }
+        
+        return response.data.imageUrl;
+      }
       
-      return response.data.imageUrl
+      return null;
     } catch (error: any) {
-      console.error("Image upload failed:", error)
-      setUploadError(error.response?.data?.error || "Failed to upload image")
-      setTimeout(() => setUploadError(null), 3000)
-      return null
+      console.error("Image upload failed:", error);
+      const errorMsg = error.response?.data?.error || "Failed to upload image";
+      setUploadError(errorMsg);
+      
+      notifications.show({
+        title: 'Upload Failed',
+        message: errorMsg,
+        color: 'red',
+        icon: <IconAlertCircle size={16} />,
+      });
+      
+      setTimeout(() => setUploadError(null), 3000);
+      return null;
     }
-  }
+  };
 
   const handleSubmit = async (values: typeof form.values) => {
     setIsLoading(true)
@@ -221,6 +351,7 @@ export function EditProjectForm({ projectId, onSuccess }: EditProjectFormProps) 
   const clearImageFile = () => {
     form.setFieldValue("imageFile", null)
     setUploadProgress(0)
+    setUploadError(null)
   }
 
   const removeCurrentImage = () => {
@@ -297,6 +428,8 @@ export function EditProjectForm({ projectId, onSuccess }: EditProjectFormProps) 
                   },
                 }}
               />
+
+              <UploadMethodIndicator />
 
               <Textarea
                 required
