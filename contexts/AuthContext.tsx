@@ -156,64 +156,237 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []); // Empty dependency array - only run once
 
-  const login = async (email: string, password: string) => {
-    try {
-      console.log('🔐 Attempting login for:', email);
+ // contexts/AuthContext.tsx - የተሻሻለው login ተግባር
+
+const login = async (email: string, password: string) => {
+  // ✅ በመጀመሪያ የግቤቶች ማረጋገጫ (Input Validation)
+  if (!email || !email.trim()) {
+    notifications.show({
+      title: 'Validation Error',
+      message: 'Email is required',
+      color: 'red',
+    });
+    return { 
+      success: false, 
+      error: 'Email is required' 
+    };
+  }
+
+  if (!password || !password.trim()) {
+    notifications.show({
+      title: 'Validation Error',
+      message: 'Password is required',
+      color: 'red',
+    });
+    return { 
+      success: false, 
+      error: 'Password is required' 
+    };
+  }
+
+  // ✅ የኢሜይል ቅርጸት ማረጋገጫ (Email Format Validation)
+  const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/;
+  if (!emailRegex.test(email)) {
+    notifications.show({
+      title: 'Validation Error',
+      message: 'Please enter a valid email address',
+      color: 'red',
+    });
+    return { 
+      success: false, 
+      error: 'Invalid email format' 
+    };
+  }
+
+  // ✅ የይለፍ ቃል ርዝመት ማረጋገጫ (Password Length Validation)
+  if (password.length < 6) {
+    notifications.show({
+      title: 'Validation Error',
+      message: 'Password must be at least 6 characters',
+      color: 'red',
+    });
+    return { 
+      success: false, 
+      error: 'Password too short' 
+    };
+  }
+
+  try {
+    console.log('🔐 Attempting login for:', email);
+    
+    // ✅ Request Timeout ያክሉ
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 seconds timeout
+
+    const response = await fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: email.trim(), password }),
+      credentials: 'include',
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    const data: LoginResponse = await response.json();
+    console.log('🔐 Login response:', { 
+      ok: response.ok, 
+      success: data.success, 
+      role: data.data?.user?.role,
+      status: response.status 
+    });
+
+    // ✅ የተለያዩ የስህተት ሁኔታዎችን ማስተናገድ
+    if (!response.ok) {
+      let errorMessage = 'Login failed';
       
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: 'include',
-      });
-
-      const data: LoginResponse = await response.json();
-      console.log('🔐 Login response:', { ok: response.ok, success: data.success, role: data.data?.user?.role });
-
-      if (!response.ok || !data.success) {
-        return { 
-          success: false, 
-          error: data.error || 'Invalid email or password' 
-        };
+      switch (response.status) {
+        case 400:
+          errorMessage = 'Invalid request. Please check your credentials.';
+          break;
+        case 401:
+          errorMessage = 'Invalid email or password. Please try again.';
+          break;
+        case 403:
+          errorMessage = 'Your account is locked. Please contact support.';
+          break;
+        case 404:
+          errorMessage = 'Account not found. Please register first.';
+          break;
+        case 429:
+          errorMessage = 'Too many attempts. Please try again later.';
+          break;
+        case 500:
+          errorMessage = 'Server error. Please try again later.';
+          break;
+        default:
+          errorMessage = data.error || 'Login failed. Please try again.';
       }
-
-      // Store tokens
-      localStorage.setItem('accessToken', data.data.accessToken);
-      localStorage.setItem('refreshToken', data.data.refreshToken);
-      
-      // Set user
-      setUser(data.data.user);
       
       notifications.show({
-        title: 'Success',
-        message: 'Logged in successfully',
-        color: 'green',
+        title: 'Login Failed',
+        message: errorMessage,
+        color: 'red',
       });
       
-      // FIXED: Check role correctly
-      console.log('🔐 User role:', data.data.user.role);
-      if (data.data.user.role === 'client') {
-        console.log('🔐 Redirecting to home page');
-        router.push('/');
-      } else if (data.data.user.role === 'admin') {
-        console.log('🔐 Redirecting to dashboard');
-        router.push('/dashboard');
-      } else {
-        console.log('🔐 Unknown role, redirecting to home');
-        router.push('/');
-      }
-      
-      return { success: true };
-    } catch (error: any) {
-      console.error('Login error:', error);
       return { 
         success: false, 
-        error: error.message || 'Login failed. Please try again.' 
+        error: errorMessage 
       };
     }
-  };
+
+    if (!data.success || !data.data) {
+      notifications.show({
+        title: 'Login Failed',
+        message: data.error || 'Invalid email or password',
+        color: 'red',
+      });
+      return { 
+        success: false, 
+        error: data.error || 'Invalid email or password' 
+      };
+    }
+
+    // ✅ የተጠቃሚ መረጃ ማረጋገጫ (User Data Validation)
+    if (!data.data.user || !data.data.user.id || !data.data.user.email) {
+      console.error('Invalid user data received:', data.data.user);
+      notifications.show({
+        title: 'Login Failed',
+        message: 'Invalid user data received',
+        color: 'red',
+      });
+      return { 
+        success: false, 
+        error: 'Invalid user data' 
+      };
+    }
+
+    // ✅ የToken ማረጋገጫ (Token Validation)
+    if (!data.data.accessToken || !data.data.refreshToken) {
+      console.error('Missing tokens:', { 
+        hasAccessToken: !!data.data.accessToken, 
+        hasRefreshToken: !!data.data.refreshToken 
+      });
+      notifications.show({
+        title: 'Login Failed',
+        message: 'Authentication tokens missing',
+        color: 'red',
+      });
+      return { 
+        success: false, 
+        error: 'Authentication failed' 
+      };
+    }
+
+    // ✅ Tokens ን ማከማቸት
+    localStorage.setItem('accessToken', data.data.accessToken);
+    localStorage.setItem('refreshToken', data.data.refreshToken);
+    
+    // ✅ ተጠቃሚ ማዘመን
+    setUser(data.data.user);
+    
+    notifications.show({
+      title: 'Success',
+      message: `Welcome back, ${data.data.user.fullName || data.data.user.email}!`,
+      color: 'green',
+    });
+    
+    // ✅ በሚገባ ያረጋገጠ የማዞሪያ አመክንዮ
+    console.log('🔐 User role:', data.data.user.role);
+    
+    // ወደ ኋላ ለመመለስ callback URL ካለ
+    const callbackUrl = localStorage.getItem('callbackUrl');
+    if (callbackUrl) {
+      localStorage.removeItem('callbackUrl');
+      router.push(callbackUrl);
+      return { success: true };
+    }
+    
+    // በሚገባ በተገለጸ ሚና መሰረት ማዞር
+    switch (data.data.user.role?.toLowerCase()) {
+      case 'admin':
+        router.push('/dashboard');
+        break;
+      case 'client':
+        router.push('/');
+        break;
+      default:
+        console.warn('Unknown role:', data.data.user.role);
+        router.push('/');
+    }
+    
+    return { success: true };
+    
+  } catch (error: any) {
+    console.error('Login error:', error);
+    
+    // ✅ የተለያዩ የስህተት አይነቶችን ማስተናገድ
+    let errorMessage = 'Login failed. Please try again.';
+    
+    if (error.name === 'AbortError') {
+      errorMessage = 'Request timeout. Please check your connection.';
+    } else if (error.message === 'Failed to fetch') {
+      errorMessage = 'Cannot connect to server. Please check if the backend is running.';
+    } else if (error.message?.includes('NetworkError')) {
+      errorMessage = 'Network error. Please check your internet connection.';
+    } else if (error.response?.status === 500) {
+      errorMessage = 'Server error. Please try again later.';
+    }
+    
+    notifications.show({
+      title: 'Login Error',
+      message: errorMessage,
+      color: 'red',
+    });
+    
+    return { 
+      success: false, 
+      error: errorMessage 
+    };
+  }
+};
 
   const register = async (data: RegisterData) => {
     try {

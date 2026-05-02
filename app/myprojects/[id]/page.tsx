@@ -247,7 +247,8 @@ export default function ProjectDetailPage() {
             <Text c="dimmed" mb="lg">
               The project you&apos;re looking for doesn&apos;t exist or has been removed.
             </Text>
-            <Button component={Link} href="/projects" leftSection={<IconArrowLeft size={16} />}>
+            <Button component={Link}  href="/myprojects"
+        leftSection={<IconArrowLeft size={16} />}>
               Back to Projects
             </Button>
           </Paper>
@@ -269,7 +270,7 @@ export default function ProjectDetailPage() {
           {/* Back Button */}
           <Button
             component={Link}
-            href="/projects"
+            href="/myprojects"
             variant="subtle"
             leftSection={<IconArrowLeft size={16} />}
             style={{ alignSelf: 'flex-start' }}
@@ -430,8 +431,8 @@ export default function ProjectDetailPage() {
               <Group justify="center" gap="xl">
                 <Group gap="xs">
                   <ActionIcon
-                    variant={isLiked ? 'filled' : 'light'}
-                    color="red"
+                    variant="subtle"
+                    color={isLiked ? 'red' : isDark ? 'gray.4' : 'gray.7'}
                     size="lg"
                     onClick={handleLike}
                     style={{
@@ -441,10 +442,11 @@ export default function ProjectDetailPage() {
                       },
                     }}
                   >
-                    {isLiked ? <IconHeartFilled size={20} /> : <IconHeart size={20} />}
+                   {isLiked ? <IconHeartFilled size={18} /> : <IconHeart size={18} />}
                   </ActionIcon>
                   <Text fw={600} c={isDark ? 'white' : 'dark.9'}>
-                    {likeCount} {likeCount === 1 ? 'Like' : 'Likes'}
+                    {likeCount || project._count?.likes}
+                      {likeCount === 1 ? 'Like' : 'Likes'}
                   </Text>
                 </Group>
                 <Group gap="xs">

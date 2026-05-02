@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
@@ -34,7 +35,6 @@ import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
 import {
   IconArrowRight,
-  IconSparkles,
   IconStar,
   IconHeart,
   IconHeartFilled,
@@ -80,6 +80,7 @@ interface Project {
     likes: number
     comments: number
   }
+   isLiked?: boolean  
 }
 
 
@@ -112,9 +113,15 @@ export default function PublicProjectsPage() {
   const itemsPerPage = isMobile ? 6 : isTablet ? 8 : 9
 
   useEffect(() => {
+       const token = localStorage.getItem('accessToken');
     setMounted(true)
-    fetchProjects()
-    fetchFeaturedProjects()
+     fetchFeaturedProjects()
+
+if(token){
+      fetchProjects()
+    }
+else{
+  fetchProjectswitouttoken()}
   }, [])
 
   useEffect(() => {
@@ -131,11 +138,11 @@ export default function PublicProjectsPage() {
     filterAndSortProjects()
   }, [projects, searchQuery, selectedTech, selectedStatus, sortBy])
 
-  const fetchProjects = async () => {
+    const fetchProjectswitouttoken= async () => {
     try {
       setLoading(true)
       setError(null)
-      const { data } = await apiClient.get('/projects')
+      const { data } = await apiClient.get('/projects/notoken')
       setProjects(data.data)
       setApiAvailable(true)
     } catch (error: any) {
@@ -152,6 +159,36 @@ export default function PublicProjectsPage() {
     }
   }
 
+ const fetchProjects = async () => {
+
+  try {
+    setLoading(true)
+    setError(null)
+    const { data } = await apiClient.get('/projects')
+    
+    setProjects(data.data)
+    
+   const likedSet = new Set(
+  data.data
+    .filter((project: Project) => project.isLiked === true)
+    .map((project: Project) => project.id)
+) as Set<string>;  // ✅ Type assertion ጨምር
+
+setLikedProjects(likedSet);
+
+    setApiAvailable(true)
+  } catch (error: any) {
+    console.error('Failed to fetch projects:', error)
+    if (error.response?.status === 404) {
+      setApiAvailable(false)
+      setError('API endpoint not found. Please check if the backend server is running.')
+    } else {
+      setError(error.response?.data?.error || 'Failed to fetch projects')
+    }
+  } finally {
+    setLoading(false)
+  }
+}
   const fetchFeaturedProjects = async () => {
     try {
       const { data } = await apiClient.get('/projects/featured')
@@ -207,49 +244,78 @@ export default function PublicProjectsPage() {
     setCurrentPage(1)
   }
 
-  const handleLike = async (projectId: string) => {
-    if (!user) {
-      router.push('/login?callbackUrl=/projects')
-      return
-    }
+const handleLike = async (projectId: string) => {
+  if (!user) {
+    router.push('/login?callbackUrl=/projects')
+    return
+  }
 
+  // ✅ የአሁኑን ሁኔታ በትክክል አግኝ
+  const isCurrentlyLiked = likedProjects.has(projectId)
+  
+  // ✅ Optimistic update - UI ን በፍጥነት አዘምን
+  setLikedProjects(prev => {
+    const newSet = new Set(prev)
+    if (newSet.has(projectId)) {
+      newSet.delete(projectId)
+    } else {
+      newSet.add(projectId)
+    }
+    return newSet
+  })
+  
+  setProjects(prev => prev.map(project => {
+    if (project.id === projectId) {
+      const currentLikes = project._count?.likes || 0
+      return {
+        ...project,
+        _count: {
+          ...project._count,
+          likes: isCurrentlyLiked ? currentLikes - 1 : currentLikes + 1
+        },
+        isLiked: !isCurrentlyLiked  // ✅ isLiked ን አዘምን
+      }
+    }
+    return project
+  }))
+
+  try {
+    await apiClient.post(`/projects/${projectId}/like`)
+  } catch (error) {
+    console.error('Failed to like project:', error)
+    
+    // ✅ ስህተት ከተፈጠረ ወደ ኋላ ተመለስ (rollback)
     setLikedProjects(prev => {
       const newSet = new Set(prev)
-      if (newSet.has(projectId)) {
-        newSet.delete(projectId)
-      } else {
+      if (isCurrentlyLiked) {
         newSet.add(projectId)
+      } else {
+        newSet.delete(projectId)
       }
       return newSet
     })
     
     setProjects(prev => prev.map(project => {
       if (project.id === projectId) {
-        const isCurrentlyLiked = likedProjects.has(projectId)
-        const currentLikes = project._count?.likes || 0
-        
         return {
           ...project,
           _count: {
             ...project._count,
-            likes: isCurrentlyLiked ? currentLikes - 1 : currentLikes + 1
-          }
+            likes: (project._count?.likes || 0) + (isCurrentlyLiked ? 1 : -1)
+          },
+          isLiked: isCurrentlyLiked
         }
       }
       return project
     }))
-
-    try {
-      await apiClient.post(`/projects/${projectId}/like`)
-    } catch (error) {
-      console.error('Failed to like project:', error)
-      notifications.show({
-        title: 'Error',
-        message: 'Failed to like project',
-        color: 'red',
-      })
-    }
+    
+    notifications.show({
+      title: 'Error',
+      message: 'Failed to like project',
+      color: 'red',
+    })
   }
+}
 
   const clearFilters = () => {
     setSearchQuery('')
@@ -654,8 +720,9 @@ export default function PublicProjectsPage() {
               {paginatedProjects.map((project) => {
                 const likeCount = project._count?.likes || 0
                 const commentCount = project._count?.comments || 0
-                const isLiked = likedProjects.has(project.id)
-                
+                const isLiked = project.isLiked || likedProjects.has(project.id)
+                                console.log("isliked",isLiked)
+
                 return (
                   <Card key={project.id} padding="lg" radius="md" withBorder style={{ backgroundColor: isDark ? theme.colors.dark[6] : 'white' }}>
                     <Card.Section>
@@ -769,8 +836,8 @@ export default function PublicProjectsPage() {
           ) : (
             <Stack gap="md">
               {paginatedProjects.map((project) => {
-                const isLiked = likedProjects.has(project.id)
-                
+                const isLiked = project.isLiked || likedProjects.has(project.id)
+                console.log("isliked",isLiked)
                 return (
                   <Paper key={project.id} p="md" radius="md" withBorder style={{ backgroundColor: isDark ? theme.colors.dark[6] : 'white' }}>
                     <Group align="flex-start" wrap="nowrap">
@@ -787,6 +854,7 @@ export default function PublicProjectsPage() {
                             </Badge>
                           </Group>
                           <Group gap="xs">
+                            
                             <ActionIcon
                               variant="subtle"
                               onClick={() => handleLike(project.id)}
