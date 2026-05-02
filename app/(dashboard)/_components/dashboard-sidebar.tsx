@@ -15,6 +15,7 @@ import {
   IconChartBar,
   IconFileText,
   IconBell,
+  IconX,
 } from "@tabler/icons-react"
 import {
   Box,
@@ -29,6 +30,7 @@ import {
   rem,
   useMantineTheme,
   useMantineColorScheme,
+  Drawer,
 } from "@mantine/core"
 
 interface DashboardSidebarProps {
@@ -53,17 +55,10 @@ const secondaryNavigation = [
   { name: "Help", href: "/help", icon: IconHelp },
 ]
 
-export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebarProps) {
+// Sidebar Content Component
+function SidebarContent({ onClose, isDark }: { onClose?: () => void; isDark: boolean }) {
   const pathname = usePathname()
-  const [mounted, setMounted] = useState(false)
-  
-  const { colorScheme } = useMantineColorScheme()
   const theme = useMantineTheme()
-  const isDark = colorScheme === 'dark'
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const NavItem = ({ item }: { item: typeof navigation[0] }) => {
     const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
@@ -103,36 +98,6 @@ export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebar
     )
   }
 
-  // Show a simplified version during SSR
-  if (!mounted) {
-    return (
-      <Box
-        style={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          backgroundColor: 'white',
-        }}
-      >
-        <Box mb="md" px="sm">
-          <Group justify="space-between" wrap="nowrap">
-            <Group gap="xs">
-              <Box
-                style={{
-                  width: rem(32),
-                  height: rem(32),
-                  borderRadius: rem(8),
-                  background: 'linear-gradient(135deg, #228be6, #7950f2)',
-                }}
-              />
-              <Text fw={700} size="lg">DevPortfolio</Text>
-            </Group>
-          </Group>
-        </Box>
-      </Box>
-    )
-  }
-
   return (
     <Box
       style={{
@@ -143,26 +108,27 @@ export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebar
         color: isDark ? theme.colors.gray[3] : theme.colors.gray[8],
       }}
     >
-      {/* Logo */}
-      <Box mb="md" px="sm">
+      {/* Logo Section */}
+      <Box mb="md" px="sm" pt="md">
         <Group justify="space-between" wrap="nowrap">
-          <UnstyledButton component={Link} href="/dashboard">
-            <Group gap="xs">
+          <UnstyledButton component={Link} href="/dashboard" style={{ flex: 1 }}>
+            <Group gap="xs" wrap="nowrap">
               <Box
                 style={{
-                  width: rem(32),
-                  height: rem(32),
-                  borderRadius: rem(8),
+                  width: rem(40),
+                  height: rem(40),
+                  borderRadius: rem(10),
                   background: 'linear-gradient(135deg, #228be6, #7950f2)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
                 <Text c="white" fw={700} size="lg">MS</Text>
               </Box>
               <Text
-                fw={700}
+                fw={800}
                 size="lg"
                 style={{
                   background: 'linear-gradient(135deg, #228be6, #7950f2)',
@@ -174,6 +140,23 @@ export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebar
               </Text>
             </Group>
           </UnstyledButton>
+
+          {/* Close Button - Only for mobile drawer */}
+          {onClose && (
+            <UnstyledButton
+              onClick={onClose}
+              style={{
+                padding: rem(8),
+                borderRadius: rem(8),
+                color: isDark ? theme.colors.gray[4] : theme.colors.gray[6],
+                '&:hover': {
+                  backgroundColor: isDark ? theme.colors.dark[5] : theme.colors.gray[1],
+                },
+              }}
+            >
+              <IconX size={20} />
+            </UnstyledButton>
+          )}
         </Group>
       </Box>
 
@@ -185,12 +168,7 @@ export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebar
           ))}
         </Stack>
 
-        <Divider 
-          my="md" 
-          style={{
-            borderColor: isDark ? theme.colors.dark[5] : theme.colors.gray[2],
-          }}
-        />
+        <Divider my="md" />
 
         <Stack gap={4}>
           {secondaryNavigation.map((item) => (
@@ -200,29 +178,18 @@ export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebar
       </ScrollArea>
 
       {/* User Profile */}
-      <Box 
-        pt="md" 
-        px="sm"
-        style={{
-          borderTop: `1px solid ${isDark ? theme.colors.dark[5] : theme.colors.gray[2]}`,
-        }}
-      >
+      <Box pt="md" px="sm" pb="md" style={{ borderTop: `1px solid ${isDark ? theme.colors.dark[5] : theme.colors.gray[2]}` }}>
         <Group justify="space-between" wrap="nowrap">
-          <Group gap="sm" wrap="nowrap">
-            <Avatar
-              src="https://github.com/shadcn.png"
-              size="md"
-              radius="xl"
-              style={{
-                border: `2px solid ${isDark ? theme.colors.blue[8] : theme.colors.blue[5]}`,
-              }}
-            />
+          <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+            <Avatar size="md" radius="xl" color="blue">
+              JD
+            </Avatar>
             <Box style={{ flex: 1, minWidth: 0 }}>
-              <Text size="sm" fw={500} c={isDark ? 'gray.3' : 'dark.8'}>
+              <Text size="sm" fw={500} c={isDark ? 'gray.3' : 'dark.8'} truncate>
                 John Doe
               </Text>
-              <Text size="xs" c={isDark ? 'gray.5' : 'dimmed'}>
-                Admin
+              <Text size="xs" c="dimmed" truncate>
+                Administrator
               </Text>
             </Box>
           </Group>
@@ -231,7 +198,6 @@ export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebar
               color: theme.colors.red[6],
               padding: rem(8),
               borderRadius: rem(8),
-              transition: 'background-color 0.2s',
               '&:hover': {
                 backgroundColor: isDark ? theme.colors.dark[5] : theme.colors.gray[1],
               },
@@ -243,4 +209,46 @@ export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebar
       </Box>
     </Box>
   )
+}
+
+export function DashboardSidebar({ isOpen, isMobile, onClose }: DashboardSidebarProps) {
+  const [mounted, setMounted] = useState(false)
+  const { colorScheme } = useMantineColorScheme()
+  const isDark = colorScheme === 'dark'
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return null
+  }
+
+  // For mobile: use Drawer
+  if (isMobile) {
+    return (
+      <Drawer
+        opened={isOpen}
+        onClose={onClose}
+        position="left"
+        size="85%"
+        padding={0}
+        withCloseButton={false}
+        styles={{
+          body: {
+            padding: 0,
+            height: '100%',
+          },
+          content: {
+            backgroundColor: isDark ? '#1a1b1e' : 'white',
+          },
+        }}
+      >
+        <SidebarContent onClose={onClose} isDark={isDark} />
+      </Drawer>
+    )
+  }
+
+  // For desktop: show regular sidebar
+  return <SidebarContent isDark={isDark} />
 }

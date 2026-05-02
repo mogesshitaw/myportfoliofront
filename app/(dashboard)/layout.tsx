@@ -25,86 +25,28 @@ function UnauthorizedPage() {
     setMounted(true)
   }, [])
 
-  // Use a static color during SSR to prevent hydration mismatch
   const backgroundColor = !mounted ? '#f8f9fa' : (isDark ? theme.colors.dark[7] : '#f8f9fa')
   const paperBg = !mounted ? 'white' : (isDark ? theme.colors.dark[6] : 'white')
   const borderColor = !mounted ? '#e9ecef' : (isDark ? theme.colors.dark[4] : theme.colors.gray[2])
   const titleColor = !mounted ? 'dark.9' : (isDark ? 'white' : 'dark.9')
 
   return (
-    <Center style={{ 
-      minHeight: '100vh',
-      background: backgroundColor
-    }}>
-      <Paper
-        radius="lg"
-        p="xl"
-        withBorder
-        style={{
-          maxWidth: 500,
-          width: '100%',
-          textAlign: 'center',
-          backgroundColor: paperBg,
-          borderColor: borderColor,
-        }}
-      >
-        <Box
-          style={{
-            width: 80,
-            height: 80,
-            borderRadius: 40,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 24px',
-          }}
-        >
+    <Center style={{ minHeight: '100vh', background: backgroundColor }}>
+      <Paper radius="lg" p="xl" withBorder style={{ maxWidth: 500, width: '100%', textAlign: 'center', backgroundColor: paperBg, borderColor: borderColor }}>
+        <Box style={{ width: 80, height: 80, borderRadius: 40, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
           <IconLock size={40} color="white" />
         </Box>
-
-        <Title order={2} size="h2" mb="sm" c={titleColor}>
-          Unauthorized Access
-        </Title>
-        
-        <Text c="dimmed" mb="lg">
-          You don&apos;t have permission to access this page. This area is restricted to administrators only.
-        </Text>
-
-        <Button
-          component={Link}
-          href="/login"
-          size="lg"
-          leftSection={<IconLogin size={18} />}
-          variant="gradient"
-          gradient={{ from: '#667eea', to: '#764ba2', deg: 135 }}
-          fullWidth
-        >
-          Go to Login
-        </Button>
-
-        <Button
-          component={Link}
-          href="/"
-          variant="subtle"
-          size="sm"
-          mt="md"
-          leftSection={<IconArrowLeft size={16} />}
-          color={!mounted ? 'dark.6' : (isDark ? 'gray.4' : 'dark.6')}
-        >
-          Back to Home
-        </Button>
+        <Title order={2} size="h2" mb="sm" c={titleColor}>Unauthorized Access</Title>
+        <Text c="dimmed" mb="lg">You don&apos;t have permission to access this page. This area is restricted to administrators only.</Text>
+        <Button component={Link} href="/login" size="lg" leftSection={<IconLogin size={18} />} variant="gradient" gradient={{ from: '#667eea', to: '#764ba2', deg: 135 }} fullWidth>Go to Login</Button>
+        <Button component={Link} href="/" variant="subtle" size="sm" mt="md" leftSection={<IconArrowLeft size={16} />} color={!mounted ? 'dark.6' : (isDark ? 'gray.4' : 'dark.6')}>Back to Home</Button>
       </Paper>
     </Center>
   )
 }
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const [opened, { toggle, close }] = useDisclosure()
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [opened, { toggle, close }] = useDisclosure(false) // Start closed on mobile
   const [mounted, setMounted] = useState(false)
   const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const pathname = usePathname()
@@ -118,12 +60,10 @@ export default function DashboardLayout({
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  // Check authentication and redirect if not admin
+console.log("toggle",opened)
+  // Check authentication
   useEffect(() => {
     if (!mounted || isLoading) return
-    
-    // If user is not logged in or not admin, show unauthorized page
     if (!user || user.role !== 'admin') {
       setIsCheckingAuth(false)
     } else {
@@ -131,23 +71,12 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, mounted, router])
 
-  // Close sidebar on mobile when path changes
-  useEffect(() => {
-    if (isMobile && opened) {
-      close()
-    }
-  }, [pathname, isMobile, close, opened])
-
-  // Show loading state during SSR or while checking auth
-  // FIXED: Use a static color when not mounted to prevent hydration mismatch
+  
+  // Show loading state
   if (!mounted || isLoading || isCheckingAuth) {
     return (
-      <Center style={{ 
-        minHeight: '100vh',
-        background: !mounted ? '#f8f9fa' : (isDark ? theme.colors.dark[7] : '#f8f9fa')
-      }}>
+      <Center style={{ minHeight: '100vh', background: !mounted ? '#f8f9fa' : (isDark ? theme.colors.dark[7] : '#f8f9fa') }}>
         <Stack align="center" gap="md">
-          {/* FIXED: Use static color during SSR, dynamic after hydration */}
           <Loader size="lg" color={!mounted ? 'blue' : (isDark ? 'white' : 'blue')} />
           <Text c="dimmed">Loading dashboard...</Text>
         </Stack>
@@ -166,7 +95,7 @@ export default function DashboardLayout({
       navbar={{
         width: 280,
         breakpoint: 'sm',
-        collapsed: { mobile: !opened },
+        collapsed: { mobile: !opened }, // Sidebar hidden on mobile when opened is false
       }}
       padding="md"
       styles={{
@@ -188,7 +117,7 @@ export default function DashboardLayout({
     >
       <AppShell.Header>
         <DashboardHeader 
-          onMenuClick={toggle}
+          onMenuClick={toggle}  // This toggles the sidebar/drawer
           isMobile={isMobile}
         />
       </AppShell.Header>
@@ -202,13 +131,7 @@ export default function DashboardLayout({
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <div 
-          style={{ 
-            maxWidth: 1400, 
-            margin: '0 auto', 
-            padding: '24px',
-          }}
-        >
+        <div style={{ maxWidth: 1400, margin: '0 auto', padding: '24px' }}>
           {children}
         </div>
       </AppShell.Main>

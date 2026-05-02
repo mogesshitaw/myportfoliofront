@@ -154,7 +154,7 @@ export default function PublicProjectsPage() {
 
   const fetchFeaturedProjects = async () => {
     try {
-      const { data } = await apiClient.get('/projects')
+      const { data } = await apiClient.get('/projects/featured')
       setFeaturedProjects(data.data || [])
     } catch (error) {
       console.error('Failed to fetch featured projects:', error)
@@ -347,7 +347,7 @@ export default function PublicProjectsPage() {
         <Stack gap="lg">
           {/* Featured Projects Section */}
         
-      {/* {featuredProjects.length > 0 && (
+       {featuredProjects.length > 0 && (
             <Box mb="xl">
               <Group justify="space-between" mb="lg">
                 <Title order={2} size="h2" c={isDark ? 'white' : 'dark.9'}>
@@ -401,7 +401,7 @@ export default function PublicProjectsPage() {
                 ))}
               </SimpleGrid>
             </Box>
-          )} */}
+          )} 
 
           {/* Stats Cards */}
           <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">

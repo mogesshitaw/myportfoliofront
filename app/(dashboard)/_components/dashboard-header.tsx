@@ -217,7 +217,8 @@ export function DashboardHeader({ onMenuClick, isMobile }: DashboardHeaderProps)
         {/* Left Section */}
         <Group gap="xs">
           {/* Mobile Menu Button */}
-          {isMobile && (
+         
+           {isMobile && (
             <ActionIcon 
               variant="subtle" 
               size="lg" 
@@ -227,7 +228,6 @@ export function DashboardHeader({ onMenuClick, isMobile }: DashboardHeaderProps)
               <IconMenu2 size={20} />
             </ActionIcon>
           )}
-          
           <Title 
             order={3} 
             fw={600} 
